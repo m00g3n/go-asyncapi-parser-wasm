@@ -8,15 +8,12 @@ import (
 
 var ErrParserEmptyResult = errors.New("parser empty result error")
 
-func toErrorMap(err gojsonschema.ResultError) map[string]interface{} {
-	if err == nil {
-		return nil
-	}
+func toErrorMap(err gojsonschema.ResultError) Error {
 	return NewError(err.Type(), err.Description())
 }
 
-func ToErrors(errs []gojsonschema.ResultError) []interface{} {
-	var result []interface{}
+func ToErrors(errs []gojsonschema.ResultError) []Error {
+	var result []Error
 	for _, err := range errs {
 		result = append(result, toErrorMap(err))
 	}

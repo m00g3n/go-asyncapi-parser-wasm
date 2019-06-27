@@ -2,9 +2,11 @@ package main
 
 import (
 	parser "parseasgo/pkg"
+
 	"strconv"
 	"syscall/js"
 
+	"github.com/fatih/structs"
 	"github.com/pkg/errors"
 )
 
@@ -17,7 +19,7 @@ func main() {
 			parser.NewInternalError(errors.Wrapf(err, `invalid argument "circularReferences" %t`, circularReferences))
 		}
 		result := parser.DefaultParser([]byte(document), circularReferences)
-		return js.ValueOf(result)
+		return structs.Map(result)
 	})
 	defer parseFunc.Release()
 	js.Global().Set("parse", parseFunc)

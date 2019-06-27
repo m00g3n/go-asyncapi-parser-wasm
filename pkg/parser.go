@@ -1,50 +1,48 @@
 package parser
 
 import (
-	"encoding/json"
-
 	asyncparser "github.com/asyncapi/parser/pkg"
 )
 
-func NewInternalError(err error) map[string]interface{} {
+func NewInternalError(err error) Error {
 	return NewError("internal error", err.Error())
 }
 
-func NewErrorResult(errors []map[string]interface{}) map[string]interface{} {
-	return map[string]interface{}{
-		"errors": errors,
+type Error struct {
+	Type        string
+	Description string
+}
+
+func NewError(errType string, description string) Error {
+	return Error{
+		Type:        errType,
+		Description: description,
 	}
 }
 
-func NewResult(document string) map[string]interface{} {
-	return map[string]interface{}{
-		"document": document,
+type Result struct {
+	Errors   []Error
+	Document string
+}
+
+func NewErrorResult(errors []Error) Result {
+	return Result{
+		Errors: errors,
 	}
 }
 
-func NewError(errType string, description string) map[string]interface{} {
-	return map[string]interface{}{
-		"type":        errType,
-		"description": description,
+func NewResult(document string) Result {
+	return Result{
+		Document: document,
 	}
 }
 
-type Parser func(document []byte, circularReferences bool) map[string]interface{}
+type Parser func(document []byte, circularReferences bool) Result
 
-var DefaultParser Parser = func(document []byte, circularReferences bool) map[string]interface{} {
+var DefaultParser Parser = func(document []byte, circularReferences bool) Result {
 	rawMsg, err := asyncparser.Parse([]byte(document), circularReferences)
-	var errors []map[string]interface{}
 	if err != nil {
-		errors = append(errors, ToErrors(err.ParsingErrors)...)
+		return NewErrorResult(ToErrors(err.ParsingErrors))
 	}
-	if len(errors) > 0 {
-		return NewErrorResult(errors)
-	}
-	doc, err2 := json.MarshalIndent(rawMsg, "", "  ")
-	if err2 != nil {
-		return NewErrorResult([]map[string]interface{}{
-			NewError("internal error", err2.Error()),
-		})
-	}
-	return NewResult(string(doc))
+	return NewResult(string(rawMsg))
 }

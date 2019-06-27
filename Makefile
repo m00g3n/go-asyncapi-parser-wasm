@@ -5,7 +5,7 @@ docker-kill:
 	@if [ ! -z $(CONTAINER_ID) ]; then docker kill $(CONTAINER_ID) > /dev/null; fi
 
 docker-rm:
-	@if [ ! -z $(CONTAINER_ID) ]; then docker rm $(CONTAINER_ID); fi
+	@if [ ! -z $(CONTAINER_ID) ]; then docker rm -f $(CONTAINER_ID); fi
 
 docker-shutdown: docker-kill docker-rm
 
