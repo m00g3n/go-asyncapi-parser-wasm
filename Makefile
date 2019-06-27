@@ -1,5 +1,6 @@
 CONTAINER_NAME=some-nginx
 CONTAINER_ID=$(shell docker ps -a -f 'name=^some-nginx$$' --format '{{.ID}}')
+WASM_NAME=main.wasm
 
 docker-kill:
 	@if [ ! -z $(CONTAINER_ID) ]; then docker kill $(CONTAINER_ID) > /dev/null; fi
@@ -20,9 +21,9 @@ docker-run:
 docker-start: docker-shutdown docker-run
 
 build:
-	GOOS=js GOARCH=wasm go build -o main.wasm
+	GOOS=js GOARCH=wasm go build -o $(WASM_NAME)
 
 clean:
-	rm ./main.wasm
+	rm -f ./$(WASM_NAME)
 
 install: clean build docker-start
