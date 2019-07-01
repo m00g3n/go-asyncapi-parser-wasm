@@ -1,12 +1,8 @@
 package parser
 
 import (
-	"errors"
-
 	"github.com/xeipuuv/gojsonschema"
 )
-
-var ErrParserEmptyResult = errors.New("parser empty result error")
 
 func toErrorMap(err gojsonschema.ResultError) Error {
 	return NewError(err.Type(), err.Description())
